@@ -38,6 +38,9 @@ bool b_btn_pressed = false;
 // Selection Menu Save
 int selection_menu_curr_selection = 0;
 
+// Browse Quotes Menu Save
+int quotes_menu_curr_selection = 0;
+
 // Quotes Handling
 const unsigned int quotes_len = 4;
 String quotes[quotes_len] = {"q1", "q2", "q3", "The fitnessgram pacer test is a multistage aerobic capacity test"};
@@ -74,6 +77,17 @@ void up_press() {
       }
       change_state(1);
       break;
+    
+    case 3:
+      // change selector
+      if (quotes_menu_curr_selection > 0) {
+        quotes_menu_curr_selection--;
+      }
+      else {
+        quotes_menu_curr_selection = quotes_len - 1;
+      }
+      change_state(3);
+      break;
   }
 }
 
@@ -86,13 +100,22 @@ void down_press() {
       }
       change_state(1);
       break;
+    
+    case 3:
+      // change selector
+      if (quotes_menu_curr_selection < quotes_len - 1) {
+        quotes_menu_curr_selection++;
+      }
+      else {
+        quotes_menu_curr_selection = 0;
+      }
+      change_state(3);
+      break;
   }
 }
 
 void a_press() {
   switch (current_state) {
-    tft.println(selection_menu_curr_selection);
-    tft.println(current_state);
     case 0:
       clear_screen();
       change_state(1);
@@ -180,15 +203,20 @@ void random_quote_menu() {
   int rand = random(quotes_len);
   tft.setCursor(0, 0);
   tft.print(rand);
-  tft.println(".");
+  tft.print(". ");
   String msg = quotes[rand];
   tft.println(msg);
 }
 
 // STATE 3
 void browse_quotes_menu() {
+  clear_screen();
   tft.setCursor(0, 0);
-  tft.println("This page is not ready, B to go back");
+  tft.print(quotes_menu_curr_selection + 1);
+  tft.print("/");
+  tft.print(quotes_len);
+  tft.print(": ");
+  tft.println(quotes[quotes_menu_curr_selection]);
 }
 
 // STATE 4
