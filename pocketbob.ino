@@ -200,9 +200,10 @@ void selection_menu() {
 
 // STATE 2
 void random_quote_menu() {
+  randomSeed(millis());
   int rand = random(quotes_len);
   tft.setCursor(0, 0);
-  tft.print(rand);
+  tft.print(rand + 1);
   tft.print(". ");
   String msg = quotes[rand];
   tft.println(msg);
