@@ -7,7 +7,7 @@
 #include "Adafruit_ILI9341.h"
 
 // States
-const String STATES[4] = {"START", "MENU", "ALL_QUOTES", "RANDOM_QUOTE"};
+// {"START", "MENU", "ALL_QUOTES", "RANDOM_QUOTE", "CREDITS"};
 int current_state = 0;
 
 // TFT Defines
@@ -47,10 +47,20 @@ void setup() {
   tft.begin();
 
   tft.setRotation(3);
-  tft.setCursor(100, 100);
+  tft.setCursor(40, 20);
   tft.setTextColor(ILI9341_GREEN);
   tft.setTextSize(2);
-  tft.println("PocketBob\nPress A To Continue.");
+  tft.println("####################");
+  delay((500));
+  tft.setCursor(40, 50);
+  tft.println("###  POCKET BOB  ###");
+  delay((500));
+  tft.setCursor(40, 80);
+  tft.println("####################");
+  delay((500));
+  tft.setCursor(40, 180);
+  tft.println("Press A To Continue.");
+
 }
 
 
@@ -71,7 +81,7 @@ void down_press() {
   switch (current_state) {
     case 1:
       // change selector
-      if (selection_menu_curr_selection < 1) {
+      if (selection_menu_curr_selection < 2) {
         selection_menu_curr_selection++;
       }
       change_state(1);
@@ -89,13 +99,8 @@ void a_press() {
       break;
     case 1:
       // select
-      if (selection_menu_curr_selection == 0) {
-        clear_screen();
-        change_state(2);
-      }
-      else {
-        tft.println("error");
-      }
+      clear_screen();
+      change_state(selection_menu_curr_selection + 2);
       break;
   }
 }
@@ -125,25 +130,46 @@ void change_state(int next_state) {
     case 2:
       random_quote_menu();
       break;
+    
+    case 3:
+      browse_quotes_menu();
+      break;
+    
+    case 4:
+      credits_menu();
+      break;
+    
+    default:
+      selection_menu();
+      break;
   }
 }
 
 // STATE 1
 void selection_menu() {
-  String options[2] = {"Random Quote", "Browse Quotes"};
+  String options[3] = {"Random Quote", "Browse Quotes", "Credits"};
   
   switch (selection_menu_curr_selection) {
     case 0:
       options[0] = "> Random Quote";
       options[1] = "Browse Quotes";
+      options[2] = "Credits";
       break;
     case 1:
       options[0] = "Random Quote";
       options[1] = "> Browse Quotes";
+      options[2] = "Credits";
+      break;
+    case 2:
+      options[0] = "Random Quote";
+      options[1] = "Browse Quotes";
+      options[2] = "> Credits";
+      break;
+    default:
       break;
   }
 
-  String msg = "Menu:\n" + options[0] + "\n" + options[1];
+  String msg = "Menu:\n" + options[0] + "\n" + options[1] + "\n" + options[2];
   clear_screen();
   center_cursor();
   tft.println(msg);
@@ -157,6 +183,18 @@ void random_quote_menu() {
   tft.println(".");
   String msg = quotes[rand];
   tft.println(msg);
+}
+
+// STATE 3
+void browse_quotes_menu() {
+  tft.setCursor(0, 0);
+  tft.println("This page is not ready, B to go back");
+}
+
+// STATE 4
+void credits_menu() {
+  tft.setCursor(0, 0);
+  tft.println("Made by Jtnoble\n\nPress B to go back.");
 }
 
 void loop() {
@@ -190,7 +228,7 @@ void loop() {
 
     // Handle B Press
     if (b_btn_state == HIGH && !b_btn_pressed) {
-      a_press();
+      b_press();
       b_btn_pressed = true;
     }
   }
