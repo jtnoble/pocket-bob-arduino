@@ -32,3 +32,6 @@ Using https://wokwi.com/, you can copy over the code and json to get the correct
 - B Button -> Arduino
   - 1:1.l -> Power GND
   - 1:2.r -> 4
+
+## Other Stuff
+- LCDWIKI API Docs: http://pan.jczn1688.com/directlink/1/SPI%20%20display%20module/2.8inch_SPI_Module_ILI9341.zip
