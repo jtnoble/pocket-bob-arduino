@@ -5,8 +5,6 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
-#include <LCDWIKI_GUI.h> //Core graphics library
-#include <LCDWIKI_SPI.h> //Hardware-specific library
 
 // TFT Defines
 #define MODEL ILI9341
@@ -17,7 +15,7 @@
 #define TFT_MOSI 11
 #define TFT_MISO 12
 #define TFT_SCK 13
-LCDWIKI_SPI tft = LCDWIKI_SPI(MODEL, TFT_CS, TFT_DC, TFT_MISO, TFT_MOSI, TFT_RST, TFT_SCK, TFT_LED);
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCK, TFT_RST, TFT_MISO);
 
 // Button Defines
 #define UP_BTN 7
@@ -64,11 +62,11 @@ StateFunction states[] = {start_screen, selection_menu, random_quote_menu, brows
 
 // Utility Functions
 void clear_screen() {
-    tft.Fill_Screen(ILI9341_BLACK);
+    tft.fillScreen(ILI9341_BLACK);
 }
 
 void center_cursor() {
-    // tft.setCursor(100, 100);
+    tft.setCursor(100, 100);
 }
 
 void change_state(int next_state) {
@@ -115,61 +113,59 @@ void b_press() {
 
 // Core Menu Screens
 void start_screen() {
-    Serial.println("Starting");
     clear_screen();
-    // tft.setCursor(40, 20);
-    tft.Set_Text_colour(ILI9341_GREEN);
-    tft.Set_Text_Size(2);
-    tft.Print_String("####################", 40, 0);
+    tft.setCursor(40, 20);
+    tft.setTextColor(ILI9341_GREEN);
+    tft.setTextSize(2);
+    tft.println("####################");
     delay(500);
-    // tft.setCursor(40, 50);
-    tft.Print_String("###  POCKET BOB  ###", 40, 20);
+    tft.setCursor(40, 50);
+    tft.println("###  POCKET BOB  ###");
     delay(500);
-    // tft.setCursor(40, 80);
-    tft.Print_String("####################", 40, 40);
+    tft.setCursor(40, 80);
+    tft.println("####################");
     delay(500);
-    // tft.setCursor(40, 180);
-    tft.Print_String("Press A To Continue.", 40, 120);
+    tft.setCursor(40, 180);
+    tft.println("Press A To Continue.");
 }
 
 void selection_menu() {
     clear_screen();
-    // tft.setCursor(0, 0);
-    tft.Print_String("Menu:\n", 0, 0);
+    tft.setCursor(0, 0);
+    tft.println("Menu:");
     for (int i = 0; i < menu_len; i++) {
         if (i == selection_menu_curr_selection) {
-            tft.Print_String("> " + (String)menu_options[i], 0, i*40+40);
+            tft.print("> ");
         } else {
-            tft.Print_String("  " + (String)menu_options[i], 0, i*40+40);
+            tft.print("  ");
         }
+        tft.println(menu_options[i]);
     }
-
-    
 }
 
 void random_quote_menu() {
     clear_screen();
     randomSeed(millis());
     int rand = random(quotes_len);
-    // tft.setCursor(0, 0);
-    tft.Print_String("Random Quote:", 0, 0);
-    tft.Print_String(quotes[rand], 0, 40);
+    tft.setCursor(0, 0);
+    tft.println("Random Quote:");
+    tft.println(quotes[rand]);
 }
 
 void browse_quotes_menu() {
     clear_screen();
-    // tft.setCursor(0, 0);
-    tft.Print_String((String)quotes_menu_curr_selection + 1, 0, 0);
-    tft.Print_String("/", 10, 0);
-    tft.Print_String((String)quotes_len, 20, 0);
-    tft.Print_String(": ", 30, 0);
-    tft.Print_String(quotes[quotes_menu_curr_selection], 0, 40);
+    tft.setCursor(0, 0);
+    tft.print(quotes_menu_curr_selection + 1);
+    tft.print("/");
+    tft.print(quotes_len);
+    tft.print(": ");
+    tft.println(quotes[quotes_menu_curr_selection]);
 }
 
 void credits_menu() {
     clear_screen();
-    // tft.setCursor(0, 0);
-    tft.Print_String("Made by Jtnoble\n\nPress B to go back.", 0, 0);
+    tft.setCursor(0, 0);
+    tft.println("Made by Jtnoble\n\nPress B to go back.");
 }
 
 // Handle Button Presses
@@ -205,8 +201,8 @@ void checkButtonStates() {
 
 // Setup and Main Loop
 void setup() {
-    tft.Init_LCD();
-    tft.Set_Rotation(3);
+    tft.begin();
+    tft.setRotation(3);
     for (int i = 0; i < NUM_BUTTONS; i++) {
         pinMode(buttonPins[i], INPUT);
     }
