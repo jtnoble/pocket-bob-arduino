@@ -5,6 +5,7 @@
 #include "SPI.h"
 #include "Adafruit_GFX.h"
 #include "Adafruit_ILI9341.h"
+#include <avr/pgmspace.h>
 
 // TFT Defines
 #define MODEL ILI9341
@@ -36,13 +37,15 @@ int selection_menu_curr_selection = 0;
 int quotes_menu_curr_selection = 0;
 
 // Quotes Array
-const char* quotes[] = {
-    "q1", 
-    "q2", 
-    "q3", 
-    "The fitnessgram pacer test is a multistage aerobic capacity test"
-};
+const char quote1[] PROGMEM = "QUOTE 1!!!";
+const char quote2[] PROGMEM = "quote 2...";
+const char quote3[] PROGMEM = "Quote 3!";
+const char quote4[] PROGMEM = "The fitnessgram Pacer Test quote";
+const char* const quotes[] PROGMEM = {quote1, quote2, quote3, quote4};
 const int quotes_len = sizeof(quotes) / sizeof(quotes[0]);
+
+// Quote Buffer
+char buffer[100];
 
 // Menu Options
 const char* menu_options[] = {"Random Quote", "Browse Quotes", "Credits"};
@@ -63,6 +66,7 @@ StateFunction states[] = {start_screen, selection_menu, random_quote_menu, brows
 // Utility Functions
 void clear_screen() {
     tft.fillScreen(ILI9341_BLACK);
+    // tft.setTextColor(ILI9341_GREEN, ILI9341_BLACK);
 }
 
 void center_cursor() {
@@ -76,6 +80,7 @@ void change_state(int next_state) {
 
 // Button Handlers
 void up_press() {
+  
     if (current_state == 1 && selection_menu_curr_selection > 0) {
         selection_menu_curr_selection--;
     } else if (current_state == 3 && quotes_menu_curr_selection > 0) {
@@ -143,15 +148,26 @@ void selection_menu() {
     }
 }
 
+void displayQuote(int index) {
+    if (index < 0 || index >= quotes_len) {
+        return; // Index out of bounds
+    }
+    // Retrieve the quote from PROGMEM into the buffer
+    strcpy_P(buffer, (char*)pgm_read_word(&(quotes[index])));
+    tft.println(buffer); // Display the quote on the screen
+}
+
+// Random Quote Menu
 void random_quote_menu() {
     clear_screen();
     randomSeed(millis());
     int rand = random(quotes_len);
     tft.setCursor(0, 0);
     tft.println("Random Quote:");
-    tft.println(quotes[rand]);
+    displayQuote(rand); // Display a random quote
 }
 
+// Browse Quotes Menu
 void browse_quotes_menu() {
     clear_screen();
     tft.setCursor(0, 0);
@@ -159,7 +175,7 @@ void browse_quotes_menu() {
     tft.print("/");
     tft.print(quotes_len);
     tft.print(": ");
-    tft.println(quotes[quotes_menu_curr_selection]);
+    displayQuote(quotes_menu_curr_selection); // Display the selected quote
 }
 
 void credits_menu() {
