@@ -35,12 +35,14 @@ const unsigned long debounceDelay = 50;
 int current_state = 0;
 int selection_menu_curr_selection = 0;
 int quotes_menu_curr_selection = 0;
+#define MAX_TEXT_LEN 200
+char lastPrintedText[MAX_TEXT_LEN] = "";
 
 // Quotes Array
-const char quote1[] PROGMEM = "QUOTE 1!!!";
-const char quote2[] PROGMEM = "quote 2...";
-const char quote3[] PROGMEM = "Quote 3!";
-const char quote4[] PROGMEM = "The fitnessgram Pacer Test quote";
+const char quote1[] PROGMEM = "This is the first quote";
+const char quote2[] PROGMEM = "A slightly longer second quote";
+const char quote3[] PROGMEM = "A much longer, yet still relatively normal quote for the third of the bunch";
+const char quote4[] PROGMEM = "The fitnessgram Pacer Test quote, a.k.a quote 4";
 const char* const quotes[] PROGMEM = {quote1, quote2, quote3, quote4};
 const int quotes_len = sizeof(quotes) / sizeof(quotes[0]);
 
@@ -64,13 +66,26 @@ typedef void (*StateFunction)();
 StateFunction states[] = {start_screen, selection_menu, random_quote_menu, browse_quotes_menu, credits_menu};
 
 // Utility Functions
+void overwriteLastText() {
+    tft.setTextColor(ILI9341_BLACK); // Set text color to black
+    tft.setCursor(0, 40);            // Adjust the cursor position if needed
+    tft.println(lastPrintedText);   // Print the last stored text
+}
+
 void clear_screen() {
-    tft.fillScreen(ILI9341_BLACK);
-    // tft.setTextColor(ILI9341_GREEN, ILI9341_BLACK);
+    tft.fillScreen(ILI9341_BLACK);  // Clear entire screen
+}
+
+void clear_top_bar() {
+    tft.fillRect(0, 0, tft.height(), 35, ILI9341_BLACK);  // Clear just the top bar where "Random Quote" is
+}
+
+void clear_menu() {
+    tft.fillRect(0, 15, 15, 80, ILI9341_BLACK); // Clear just the menu cursor
 }
 
 void center_cursor() {
-    tft.setCursor(100, 100);
+    tft.setCursor(100, 100);  // Place cursor roughly centered (kinda not needed)
 }
 
 void change_state(int next_state) {
@@ -104,16 +119,18 @@ void down_press() {
 
 void a_press() {
     if (current_state == 0) {
+        clear_screen();
         change_state(1);
     } else if (current_state == 1) {
+        clear_screen();
         change_state(selection_menu_curr_selection + 2);
     }
 }
 
 void b_press() {
-    if (current_state != 0) {
-        change_state(1);
-    }
+    // Always return to state 1
+    clear_screen();
+    change_state(1);
 }
 
 // Core Menu Screens
@@ -135,7 +152,7 @@ void start_screen() {
 }
 
 void selection_menu() {
-    clear_screen();
+    clear_menu();
     tft.setCursor(0, 0);
     tft.println("Menu:");
     for (int i = 0; i < menu_len; i++) {
@@ -152,14 +169,24 @@ void displayQuote(int index) {
     if (index < 0 || index >= quotes_len) {
         return; // Index out of bounds
     }
-    // Retrieve the quote from PROGMEM into the buffer
+    // Overwrite the last text before printing the new one
+    overwriteLastText();
+    
+    // Retrieve the new quote from PROGMEM
     strcpy_P(buffer, (char*)pgm_read_word(&(quotes[index])));
-    tft.println(buffer); // Display the quote on the screen
+    
+    // Store the new text
+    strncpy(lastPrintedText, buffer, MAX_TEXT_LEN);
+    
+    // Print the new text
+    tft.setTextColor(ILI9341_GREEN); // Set text color to green
+    tft.setCursor(0, 40);             // Adjust the cursor position
+    tft.println(buffer);
 }
 
 // Random Quote Menu
 void random_quote_menu() {
-    clear_screen();
+    clear_top_bar();
     randomSeed(millis());
     int rand = random(quotes_len);
     tft.setCursor(0, 0);
@@ -169,7 +196,7 @@ void random_quote_menu() {
 
 // Browse Quotes Menu
 void browse_quotes_menu() {
-    clear_screen();
+    clear_top_bar();
     tft.setCursor(0, 0);
     tft.print(quotes_menu_curr_selection + 1);
     tft.print("/");
