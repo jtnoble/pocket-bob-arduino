@@ -13,6 +13,20 @@ Using https://wokwi.com/, you can copy over the code and json to get the correct
 - 4x 10k Resistors
 - Many wires
 
+## Images
+
+##### Main Menu:
+![pocketbob_mainmenu](https://github.com/user-attachments/assets/aeb79c00-efba-4f31-867d-5c3113fa9ec1)
+
+##### Selection Menu:
+![pocketbob_selectionmenu](https://github.com/user-attachments/assets/9d879e88-9cba-4773-a1c0-459825d955d2)
+
+##### Printed Model Outside/Inside:
+![pbob_model_outside](https://github.com/user-attachments/assets/1f7b10d4-be9a-409a-8033-ad6e0c66a193)
+![pbob_model_inside](https://github.com/user-attachments/assets/b6ff9c99-cef6-414e-b3c2-63946eb80f7e)
+
+
+
 ## Wiring
 
 #### Battery Power:
